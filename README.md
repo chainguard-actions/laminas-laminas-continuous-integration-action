@@ -9,6 +9,7 @@ Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at
 | Version | Tag | Upstream commit |
 |---------|-----|-----------------|
 | 1.42.0 | [`1.42.0`](https://github.com/chainguard-actions/laminas-laminas-continuous-integration-action/tree/1.42.0) | [`48136b0`](https://github.com/laminas/laminas-continuous-integration-action/commit/48136b071fe32a980129e055128ec740a2dc1e18) |
+| 1.44.0 | [`1.44.0`](https://github.com/chainguard-actions/laminas-laminas-continuous-integration-action/tree/1.44.0) | [`a47922e`](https://github.com/laminas/laminas-continuous-integration-action/commit/a47922ef19240597d58adc1b1273f479eb7fc0e9) |
 
 ## Privacy
 
