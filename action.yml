@@ -1,0 +1,14 @@
+name: 'Laminas Continuous Integration'
+description: 'Run a CI check for the package'
+branding:
+  icon: 'check'
+  color: 'green'
+inputs:
+  job:
+    description: 'JSON string representing the job to run'
+    required: true
+runs:
+  using: 'docker'
+  image: 'docker://ghcr.io/laminas/laminas-continuous-integration@sha256:3e1f5b97ccabf424137a8ccee249d6a5cb1fc275da2e2b876be47964b0e9975a' # tag: 1
+  args:
+    - ${{ inputs.job }}
