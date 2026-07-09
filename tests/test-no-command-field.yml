@@ -1,0 +1,19 @@
+name: Test job JSON with no command field
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Run action with no command field in job JSON
+        id: action
+        uses: .
+        with:
+          job: '{"php":"8.2","extensions":[],"ini":[],"dependencies":"locked"}'
+        env:
+          GITHUB_TOKEN: ""
+      - name: Assert action completed successfully
+        run: |
+          echo "Action completed with missing command field - PASS"
+          echo "PASS: action exited 0 as expected when command field is absent"

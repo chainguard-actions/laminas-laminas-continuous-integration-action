@@ -1,0 +1,19 @@
+name: Test minimal job JSON
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Run action with minimal job JSON
+        id: action
+        uses: .
+        with:
+          job: '{"php":"8.1","command":""}'
+        env:
+          GITHUB_TOKEN: ""
+      - name: Assert action completed successfully
+        run: |
+          echo "Action completed with minimal job JSON - PASS"
+          echo "PASS: action exited 0 as expected for minimal job with empty command"
