@@ -1,0 +1,10 @@
+{
+    "default": true,
+    "MD007": { "indent": 4 },
+    "MD013": false,
+    "MD014": false,
+    "MD024": false,
+    "MD028": false,
+    "MD031": { "list_items": false },
+    "MD034": false
+}

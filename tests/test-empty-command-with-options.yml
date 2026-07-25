@@ -1,0 +1,18 @@
+name: Test empty command with optional fields
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Run action with empty command and optional fields
+        id: action
+        uses: .
+        with:
+          job: >-
+            {"php":"8.3","extensions":[],"ini":["memory_limit=-1"],"dependencies":"latest","command":"","ignore_php_platform_requirement":false,"additional_composer_arguments":[],"before_script":[],"after_script":[]}
+      - name: Assert action succeeded with empty command and optional fields
+        run: |
+          echo "Action completed successfully with empty command and optional fields"
+          echo "PASS"
