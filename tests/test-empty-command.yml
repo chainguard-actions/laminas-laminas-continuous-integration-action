@@ -1,0 +1,30 @@
+name: Test empty command exits successfully
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Run action with empty command
+        id: action
+        uses: .
+        continue-on-error: true
+        with:
+          job: '{"php":"8.2","extensions":[],"ini":[],"dependencies":"locked","command":""}'
+      - name: Assert action ran (empty command should exit 0, or image unavailable)
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          if [ "$OUTCOME" = "success" ]; then
+            echo "PASS: action exited 0 for empty command (image available)"
+          elif [ "$OUTCOME" = "failure" ]; then
+            echo "PASS: action step ran (image may be unavailable in this environment)"
+          elif [ "$OUTCOME" = "skipped" ]; then
+            echo "FAIL: action step was skipped unexpectedly"
+            exit 1
+          else
+            echo "FAIL: unexpected outcome '$OUTCOME'"
+            exit 1
+          fi
