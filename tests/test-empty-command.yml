@@ -1,0 +1,19 @@
+name: Test empty command exits successfully
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Run action with empty command
+        id: action
+        # An empty command causes the action to exit 0 immediately
+        # without attempting any git checkout or composer install
+        uses: .
+        with:
+          job: '{"php":"8.3","extensions":[],"ini":[],"dependencies":"locked","command":""}'
+      - name: Assert action succeeded
+        run: |
+          echo "Action completed successfully with empty command"
+          echo "PASS"

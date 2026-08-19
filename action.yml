@@ -9,6 +9,6 @@ inputs:
     required: true
 runs:
   using: 'docker'
-  image: 'docker://ghcr.io/laminas/laminas-continuous-integration@sha256:3e1f5b97ccabf424137a8ccee249d6a5cb1fc275da2e2b876be47964b0e9975a' # :1
+  image: 'docker://ghcr.io/laminas/laminas-continuous-integration:1@sha256:e621d82621f143838af89820573e8521e34c84291594f1ead5634f95acb2893d'
   args:
     - ${{ inputs.job }}
