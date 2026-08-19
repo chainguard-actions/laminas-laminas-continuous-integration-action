@@ -1,0 +1,18 @@
+name: Test optional fields in job JSON
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Run action with all optional fields and empty command
+        id: action
+        uses: .
+        with:
+          job: >-
+            {"php":"8.2","extensions":["json","mbstring"],"ini":["memory_limit=-1"],"dependencies":"locked","command":"","ignore_php_platform_requirement":false,"additional_composer_arguments":[],"before_script":[],"after_script":[]}
+      - name: Assert action completed successfully with optional fields
+        run: |
+          echo "Action completed with exit code 0 (all optional fields accepted, empty command exits cleanly)"
+          echo "PASS"

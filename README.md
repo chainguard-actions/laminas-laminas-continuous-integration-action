@@ -1,19 +1,340 @@
-# laminas/laminas-continuous-integration-action
+# Laminas Continuous Integration GitHub Action
 
-Run a CI check for the package
+> ## 🇷🇺 Русским гражданам
+> 
+> Мы, участники Laminas, родились и живем в разных странах. У многих из нас есть друзья, родственники и коллеги как в России, так и в Украине. Некоторые из нас родились в России. Некоторые из нас живут в России. У некоторых бабушки и дедушки сражались с фашистами во Второй мировой войне. Здесь никто не поддерживает фашизм.
+> 
+> У одного из нас есть украинская родственница, которая спаслась из дома вместе с сыном. Поезд задержался из-за бомбежки на дороге впереди. У нас есть друзья, которые прячутся в бомбоубежищах. Мы с тревогой ждем весточки от них после воздушных налетов, которые беспорядочно наносят удары и попадают по больницам, школам, детским садам и домам. Мы не берем это из каких-либо СМИ. Мы наблюдаем это напрямую.
+> 
+> Вы доверяете нам достаточно, чтоб использовать наши программы, и мы просим вас довериться нам вновь. Мы нуждаемся в помощи. Выходите и протестуйте против этой бесполезной войны. Остановите кровопролитие. Скажите "Нет войне!"
+> 
+> ## 🇺🇸 To Citizens of Russia
+> 
+> We at Laminas come from all over the world. Many of us have friends, family and colleagues in both Russia and Ukraine. Some of us were born in Russia. Some of us currently live in Russia. Some have grandparents who fought Nazis in World War II. Nobody here supports fascism.
+> 
+> One team member has a Ukrainian relative who fled her home with her son. The train was delayed due to bombing on the road ahead. We have friends who are hiding in bomb shelters. We anxiously follow up on them after the air raids, which indiscriminately fire at hospitals, schools, kindergartens and houses. We're not taking this from any media. These are our actual experiences.
+> 
+> You trust us enough to use our software. We ask that you trust us to say the truth on this. We need your help. Go out and protest this unnecessary war. Stop the bloodshed. Say "stop the war!"
 
-Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at [https://github.com/laminas/laminas-continuous-integration-action](https://github.com/laminas/laminas-continuous-integration-action).
+This repository represents a GitHub Action that runs a single PHP QA job, using the [laminas/laminas-continuous-integration image](https://ghcr.io/laminas/laminas-continuous-integration).
 
-## Versions
+A job is presented as an argument to the container, and will be a JSON string representing the job to run.
 
-| Version | Tag | Upstream commit |
-|---------|-----|-----------------|
-| 1.41.0 | [`1.41.0`](https://github.com/chainguard-actions/laminas-laminas-continuous-integration-action/tree/1.41.0) | [`ff2b3dd`](https://github.com/laminas/laminas-continuous-integration-action/commit/ff2b3ddf9f651ebca89c333469d40aeffc38228e) |
-| 1.42.0 | [`1.42.0`](https://github.com/chainguard-actions/laminas-laminas-continuous-integration-action/tree/1.42.0) | [`48136b0`](https://github.com/laminas/laminas-continuous-integration-action/commit/48136b071fe32a980129e055128ec740a2dc1e18) |
-| 1.43.0 | [`1.43.0`](https://github.com/chainguard-actions/laminas-laminas-continuous-integration-action/tree/1.43.0) | [`5f4512e`](https://github.com/laminas/laminas-continuous-integration-action/commit/5f4512e23ab587455e9f0a39e4616dad4550de4f) |
-| 1.44.0 | [`1.44.0`](https://github.com/chainguard-actions/laminas-laminas-continuous-integration-action/tree/1.44.0) | [`a47922e`](https://github.com/laminas/laminas-continuous-integration-action/commit/a47922ef19240597d58adc1b1273f479eb7fc0e9) |
-| 1.45.0 | [`1.45.0`](https://github.com/chainguard-actions/laminas-laminas-continuous-integration-action/tree/1.45.0) | [`07bce26`](https://github.com/laminas/laminas-continuous-integration-action/commit/07bce265971b2d19f607e47adbb3c04a913145ec) |
-| 1.46.0 | [`1.46.0`](https://github.com/chainguard-actions/laminas-laminas-continuous-integration-action/tree/1.46.0) | [`757a627`](https://github.com/laminas/laminas-continuous-integration-action/commit/757a62736b25b11240101d3c616fff4cbc707cfd) |
+> **NOTE** that it is a JSON string representation, and not an actual JSON object.
+
+The JSON string should represent an object with the following information:
+
+```json
+{
+  "php": "string PHP minor version to run against",
+  "extensions": [
+    "extension names to install; names are from the ondrej PHP repository, minus the php{VERSION}- prefix"
+  ],
+  "ini": [
+    "php.ini directives, one per element; e.g. 'memory_limit=-1'"
+  ],
+  "dependencies": "dependencies to test against; one of lowest, locked, latest",
+  "ignore_platform_reqs_on_8": "(boolean; OPTIONAL; DEPRECATED) Whether or not to ignore platform requirements on PHP 8; defaults to true",
+  "ignore_php_platform_requirement": "(boolean; OPTIONAL) Whether or not to ignore PHP platform requirement; defaults to false",
+  "command": "command to run to perform the check (empty in case you dont want to excecute any command)",
+  "additional_composer_arguments": [
+    "arguments which will be passed to `composer install` or `composer update`, passed as a list or as a list; e.g. --no-scripts"
+  ],
+  "before_script": [
+    "tool configuration linting",
+    "tool specific setting overrides",
+    "specific composer dependency to be installed prior executing command"
+  ],
+  "after_script": [
+    "post process tool result"
+  ]
+}
+```
+
+The PHP version and command are required; all other elements are optional.
+
+It will then execute the job, and the exit status will determine job failure or success.
+
+Generally speaking, you will use this in combination with the [laminas/laminas-ci-matrix-action](https://github.com/laminas/laminas-ci-matrix-action), which will build a matrix of jobs for you based on configuration files already present in your package.
+
+## Usage
+
+Create `.github/workflows/continuous-integration.yml` file with following content:
+
+```yaml
+name: "Continuous Integration"
+
+on:
+  pull_request:
+  push:
+    branches:
+
+jobs:
+  matrix:
+    name: Generate job matrix
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+    steps:
+      - name: Gather CI configuration
+        id: matrix
+        uses: laminas/laminas-ci-matrix-action@v1
+  qa:
+    name: QA Checks
+    needs: [matrix]
+    runs-on: ${{ matrix.operatingSystem }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.matrix.outputs.matrix) }}
+    steps:
+      - name: ${{ matrix.name }}
+        uses: laminas/laminas-continuous-integration-action@v1
+        env:
+          "GITHUB_TOKEN": ${{ secrets.GITHUB_TOKEN }}
+        with:
+          job: ${{ matrix.job }}
+```
+
+The same can be achieved with our reusable workflow:
+
+```yaml
+name: "Continuous Integration"
+
+on:
+  pull_request:
+  push:
+    branches:
+
+jobs:
+  ci:
+    uses: laminas/workflow-continuous-integration/.github/workflows/continuous-integration.yml@1.x
+```
+
+> ### Duplicate CI runs
+>
+> When pull requests are opened from branches in the same repository, the CI pipeline could run twice for the same commit: once when pushed to a branch and once when the PR is opened.
+> Workflow triggers can be adjusted to only run for specific branches or to skip branches using simple glob patterns.
+> See the GitHub documentation for [Events that trigger workflows](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#running-your-workflow-only-when-a-push-to-specific-branches-occurs) for more info.
+
+> ### actions/checkout not required
+>
+> The action will perform a checkout of the repository at the requested reference as part of its work, and therefore does not require the actions/checkout action as a preceding step.
+
+> ### GITHUB_TOKEN not required
+>
+> While injection of the `GITHUB_TOKEN` env variable is demonstrated above, in most cases it is not necessary.
+> Only add it if you start seeing rate limit issues when using Composer (e.g., when you receive a "Could not authenticate against github.com" message when installing dependencies).
+
+### Pre/Post commands
+
+Some packages may require additional setup steps: setting up a web server to test an HTTP client, seeding a database or cache service, etc.
+Other times, you may want to do additional reporting, particularly if the QA command failed.
+
+To enable this, you may create one or more of the following files in your package:
+
+- `.laminas-ci/pre-install.sh`
+- `.laminas-ci/pre-run.sh`
+- `.laminas-ci/post-run.sh`
+
+(Note: the files MUST be executable to be consumed!)
+
+The `.laminas-ci/pre-install.sh` command runs before any other command is executed in the action, and will receive the following arguments:
+
+- `$1`: the user the QA command will run under
+- `$2`: the WORKDIR path
+- `$3`: the `$JOB` passed to the entrypoint (see above)
+- `$4`: the `$PHP` (<major>.<minor>) configured for execution
+
+The `.laminas-ci/pre-run.sh` command runs immediately prior to the QA command, and will receive the following arguments:
+
+- `$1`: the user the QA command will run under
+- `$2`: the WORKDIR path
+- `$3`: the `$JOB` passed to the entrypoint (see above)
+- `$4`: the `$PHP` (<major>.<minor>) configured for execution
+
+It is also possible to pass `before_script` with a list of commands via the `$JOB` variable.
+
+The `.laminas-ci/post-run.sh` command will receive these arguments:
+
+- `$1`: the exit status of the QA command
+- `$2`: the user the QA command will run under
+- `$3`: the WORKDIR path
+- `$4`: the `$JOB` passed to the entrypoint (see above)
+- `$5`: the `$PHP` (<major>.<minor>) configured for execution
+
+It is also possible to pass `after_script` with a list of commands via the `$JOB` variable. 
+`$STATUS` is a variable containing the exit code of the command and can be used in the commands listed in `after_script`. 
+
+#### Parsing the $JOB
+
+You may want to grab elements of the `$JOB` argument in order to branch logic.
+Generally speaking, you can use the [jq](https://stedolan.github.io/jq/) command to get at this data.
+As an example, to get the PHP version:
+
+```bash
+JOB=$3
+PHP_VERSION=$(echo "${JOB}" | jq -r '.php')
+```
+
+If you want to conditionally skip setup based on the command (in this case, exiting early if the command to run is not phpunit):
+
+```bash
+JOB=$3
+COMMAND=$(echo "${JOB}" | jq -r '.command')
+if [[ ! ${COMMAND} =~ phpunit ]];then
+    exit 0
+fi
+```
+
+Perhaps after running a job against locked dependencies, you want to see if newer versions are available:
+
+```bash
+JOB=$3
+DEPS=$(echo "${JOB}" | jq -r '.dependencies')
+if [[ "${DEPS}" != "locked" ]];then
+    exit 0
+fi
+# check for newer versions...
+```
+
+If you need access to the list of extensions or php.ini directives, you should likely write a script in PHP or node to do so.
+
+#### Using PECL
+
+One key reason to use a `.laminas-ci/pre-install.sh` script is to install an extension via PECL.
+You may need to do this if no corresponding package exists for an extension you need, or if you need to test against a different version than is in the Sury repository.
+
+An example of such a script:
+
+```bash
+#!/bin/bsh
+# .laminas-ci/pre-install.sh
+
+pecl install couchbase-2.6.2
+```
+
+### Using locally
+
+The [standard Laminas Continuous Integration workflow](https://gist.github.com/weierophinney/9decd19f76b7d9745c6559074053fa65) defines one job using the laminas/laminas-ci-matrix-action to create the matrix, and defines another job to run the various jobs in the matrix that consumes it.
+Unfortunately, as of this writing, tools like [nektos/act](https://github.com/nektos/act) are unable to work with job/step dependencies, nor with workflow metadata expressions, meaning you cannot run the full suite at once.
+
+What you _can_ do, however, is run individual jobs via the [laminas/laminas-continuous-integration container](https://ghcr.io/laminas/laminas-continuous-integration).
+
+It defines an entrypoint that accepts a single argument, a JSON string. The JSON string should contain the following elements:
+
+- command: (string; required) the command to run (e.g., `./vendor/bin/phpunit`)
+- php: (string; required) the PHP version to use when running the check
+- extensions: (array of strings; optional) additional extensions to install.
+  The names used should correspond to package names from the Sury repository, minus the `php{version}-` prefix.
+  As examples, "sqlite3" or "tidy".
+- ini: (array of strings; optional) php.ini directives to use.
+  Each item should be the full directive; e.g., `memory_limit=-1` or `date.timezone=America/New_York`.
+- dependencies: (string; optional) the dependency set to run against: lowest, locked, or latest.
+  If not provided, "locked" is used.
+
+To run a test locally, first, pull the container:
+
+```bash
+$ docker pull ghcr.io/laminas/laminas-continuous-integration:1
+```
+
+Once you have pulled it, you can run individual jobs.
+The tricks to remember are:
+
+- You need to set bind the package directory as a volume.
+- You need to set the container WORKDIR to that volume.
+- You need to provide the job JSON.
+
+As an example, if you wanted to run the CS checks under PHP 7.4 using locked dependencies, you could do something like the following:
+
+```bash
+$ docker run -v $(realpath .):/github/workspace -w=/github/workspace ghcr.io/laminas/laminas-continuous-integration:1  '{"php":"7.4","dependencies":"locked","extensions":[],"ini":["memory_limit=-1"],"command":"./vendor/bin/phpcs"}'
+```
+
+The trick to remember: the job JSON should generally be in single quotes, to allow the `"` characters used to delimit properties and strings in the JSON to not cause interpolation issues.
+
+## PHP versions, extensions, and tools available
+
+The container the action provides and consumes builds off the ubuntu:focal image, installs the [Sury PHP repository](https://deb.sury.org/), and installs PHP versions:
+
+- 5.6
+- 7.0
+- 7.1
+- 7.2
+- 7.3
+- 7.4
+- 8.0
+- 8.1
+- 8.2
+- 8.3
+- 8.4
+
+Each provides the following extensions by default:
+
+- bz2
+- curl
+- fileinfo
+- intl
+- json
+- mbstring
+- phar
+- readline
+- sockets
+- xml
+- xsl
+- zip
+
+You may specify other extensions to install during a job by selecting them from the list of packages in the Sury repository, and dropping the `php{VERSION}` prefix; e.g., the package "php7.4-tidy" provides the "tidy" extension, so you would only specify "tidy" if you want to include that extension for your build.
+
+We also provide the following extensions:
+
+- sqlsrv (version 5.9.0)
+- pdo_sqlsrv (version 5.9.0)
+
+Other extensions may be installed using pecl, or directly retrieving the extension package, and doing the `phpize`/`configure`/`make` dance; this can be done in a [pre-run command script](#pre-post-commands).
+
+### Other tools available
+
+The container provides the following tools:
+
+- Composer (v2 release)
+
+- [cs2pr](https://github.com/staabm/annotate-pull-request-from-checkstyle), which creates PR annotations from checkstyle output. If a tool you are using, such as `phpcs`, provides checkstyle output, you can pipe it to `cs2pr` to create PR annotations from errors/warnings/etc. raised.
+
+- [roave-backward-compatibility-check](https://github.com/Roave/BackwardCompatibilityCheck), which checks the code for BC breakages and creates PR annotations in case something will break the exposed API.
+
+- A `markdownlint` binary, via the [DavidAnson/markdownlint-cli2](https://github.com/DavidAnson/markdownlint-cli2) package.
+  A default configuration is provided that disables the following rules:
+
+  - MD013 (line-length)
+  - MD014 (dollar signs used before commands without showing output)
+  - MD024 (duplicate header)
+  - MD028 (blank line inside block quote)
+  - MD034 (bare URLs)
+
+  Consumers can provide their own rules via a [.markdownlint.json](https://github.com/DavidAnson/markdownlint-cli2#markdownlintjsonc-or-markdownlintjson) file.
+
+- A `xmllint` binary, via the [libxml2-utils](https://packages.debian.org/stretch/libxml2-utils) package.
+
+- A `yamllint` binary, via the [adrienverge/yamllint](https://github.com/adrienverge/yamllint) package.
+
+- The [jq](https://stedolan.github.io/jq/) command, a CLI JSON processor.
+
+## Notes on contributing
+
+This package includes a workflow that will build the container during pull request, to verify that builds complete successfully.
+
+The workflow has three different conditional build steps:
+
+- One that happens only on release; this is irrelevant to pull requests.
+- Two that happen for pull requests:
+  - One that triggers if the repository's `CONTAINER_USERNAME` (and, by extension, `CONTAINER_PAT`) secret is present.
+  - One that triggers if the repository's `CONTAINER_USERNAME` (and, by extension, `CONTAINER_PAT`) secret is NOT present.
+
+In the case where the repository secrets are present, the build will also cache layers it has built, which will speed up later builds.
+However, because repository secrets are not provided when a pull request is performed from a forked repository, the second case will kick in; in that scenario, the build will still run, but no layers will be pushed to the container registry.
+
+As such, if you are a Laminas Technical Steering Committee member or a maintainer with write access to this repository, please submit your patches via branches pushed directly to the repository, as this will speed up builds for everyone.
 
 ## Privacy
 

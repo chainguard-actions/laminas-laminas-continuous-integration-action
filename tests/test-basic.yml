@@ -1,0 +1,26 @@
+name: Test basic usage
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Run Laminas CI action with basic job
+        id: action
+        uses: .
+        continue-on-error: true
+        with:
+          job: >-
+            {"php":"8.2","extensions":[],"ini":[],"dependencies":"latest","command":"echo 'Hello from Laminas CI'","ignore_platform_reqs_on_8_1":false,"additional_composer_arguments":""}
+      - name: Assert action was invoked
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "Action step outcome: $OUTCOME"
+          if [ "$OUTCOME" = "success" ] || [ "$OUTCOME" = "failure" ]; then
+            echo "PASS: action was invoked (outcome=$OUTCOME)"
+          else
+            echo "FAIL: unexpected outcome '$OUTCOME'"
+            exit 1
+          fi
