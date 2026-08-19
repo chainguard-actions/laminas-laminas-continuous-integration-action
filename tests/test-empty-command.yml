@@ -1,0 +1,18 @@
+name: Test empty command exits successfully
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Run action with empty command
+        id: action
+        # When command is empty, the entrypoint prints "Command is empty; nothing to run" and exits 0
+        # We expect this step to succeed (exit 0)
+        uses: .
+        with:
+          job: '{"php":"8.2","command":"","extensions":[],"ini":[],"dependencies":"locked"}'
+      - name: Assert action succeeded
+        run: |
+          echo "PASS: action exited successfully with empty command"

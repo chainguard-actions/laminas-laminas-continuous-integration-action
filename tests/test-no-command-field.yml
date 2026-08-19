@@ -1,0 +1,18 @@
+name: Test missing command field exits successfully
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Run action with no command field in job JSON
+        id: action
+        # When command field is absent, jq returns "" via '.command // ""'
+        # The entrypoint prints "Command is empty; nothing to run" and exits 0
+        uses: .
+        with:
+          job: '{"php":"8.1","extensions":[],"ini":[],"dependencies":"locked"}'
+      - name: Assert action succeeded
+        run: |
+          echo "PASS: action exited successfully when command field is absent"
