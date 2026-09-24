@@ -15,6 +15,7 @@ Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at
 | 1.44.0 | [`1.44.0`](https://github.com/chainguard-actions/laminas-laminas-continuous-integration-action/tree/1.44.0) | [`a47922e`](https://github.com/laminas/laminas-continuous-integration-action/commit/a47922ef19240597d58adc1b1273f479eb7fc0e9) |
 | 1.45.0 | [`1.45.0`](https://github.com/chainguard-actions/laminas-laminas-continuous-integration-action/tree/1.45.0) | [`07bce26`](https://github.com/laminas/laminas-continuous-integration-action/commit/07bce265971b2d19f607e47adbb3c04a913145ec) |
 | 1.46.0 | [`1.46.0`](https://github.com/chainguard-actions/laminas-laminas-continuous-integration-action/tree/1.46.0) | [`757a627`](https://github.com/laminas/laminas-continuous-integration-action/commit/757a62736b25b11240101d3c616fff4cbc707cfd) |
+| 1.47.0 | [`1.47.0`](https://github.com/chainguard-actions/laminas-laminas-continuous-integration-action/tree/1.47.0) | [`cf90abc`](https://github.com/laminas/laminas-continuous-integration-action/commit/cf90abc1ac0c035287580d7d6c3464e8999fc986) |
 | v1.46 | [`v1.46`](https://github.com/chainguard-actions/laminas-laminas-continuous-integration-action/tree/v1.46) | [`757a627`](https://github.com/laminas/laminas-continuous-integration-action/commit/757a62736b25b11240101d3c616fff4cbc707cfd) |
 
 ## Privacy
