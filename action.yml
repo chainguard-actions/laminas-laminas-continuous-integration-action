@@ -1,0 +1,14 @@
+name: 'Laminas Continuous Integration'
+description: 'Run a CI check for the package'
+branding:
+  icon: 'check'
+  color: 'green'
+inputs:
+  job:
+    description: 'JSON string representing the job to run. Its command, before_script and after_script entries are executed as shell commands; only pass trusted values (e.g. a workflow-generated matrix), never attacker-controlled data.'
+    required: true
+runs:
+  using: 'docker'
+  image: 'docker://ghcr.io/laminas/laminas-continuous-integration:1@sha256:3f0dd7573f0e6e3a6e4f1c0d03b3e5131167277de87d4c677966d00d03fe6201'
+  args:
+    - ${{ inputs.job }}

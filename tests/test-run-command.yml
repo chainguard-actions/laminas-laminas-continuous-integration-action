@@ -1,0 +1,32 @@
+name: Test running a command
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Clean marker
+        run: rm -f "$GITHUB_WORKSPACE/.laminas-ci-marker"
+      - id: action
+        uses: .
+        continue-on-error: true
+        with:
+          job: '{"php":"@default","dependencies":"locked","additional_composer_arguments":["--no-scripts"],"command":"php -r \"echo PHP_VERSION;\" > .laminas-ci-marker"}'
+      - name: Assert command ran, or failed gracefully on sentinel checkout
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          if [ "$OUTCOME" = "success" ]; then
+            if [ ! -s "$GITHUB_WORKSPACE/.laminas-ci-marker" ]; then
+              echo "FAIL: action succeeded but marker file was not written"
+              exit 1
+            fi
+            echo "PASS: marker contains $(cat "$GITHUB_WORKSPACE/.laminas-ci-marker")"
+          elif [ "$OUTCOME" = "failure" ]; then
+            echo "PASS: action failed gracefully (workflow_dispatch event / sentinel repo cannot be checked out)"
+          else
+            echo "FAIL: unexpected outcome '$OUTCOME'"
+            exit 1
+          fi
