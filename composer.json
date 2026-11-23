@@ -1,0 +1,15 @@
+{
+    "name": "laminas/laminas-continuous-integration",
+    "description": "Provides external tools for the CI container.",
+    "license": "MIT",
+    "config": {
+        "platform": {
+            "php": "8.2.99"
+        }
+    },
+    "require": {
+        "laminas/internal-tooling": "^1.3.0",
+        "roave/backward-compatibility-check": "^8.3",
+        "staabm/annotate-pull-request-from-checkstyle": "^1.8"
+    }
+}
